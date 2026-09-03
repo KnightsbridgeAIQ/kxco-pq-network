@@ -1,0 +1,75 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag or ref to publish (e.g. v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  # contents: write is needed to attach the SBOM to the GitHub Release. An
+  # Actions artifact is not a published SBOM: it expires on the retention
+  # window and needs an authenticated GitHub session to fetch, so a third party
+  # assessing supply chain posture cannot read it. A release asset is a
+  # permanent unauthenticated URL, which is the thing being claimed.
+  contents: write
+  id-token: write   # required for Trusted Publishing OIDC and --provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm CLI to the 11.x line
+        # Trusted Publishing's OIDC integration needs npm >= 11.5.1 and the npm
+        # bundled with the runner's Node is older. Pinned to 11.x, never @latest:
+        # npm 12 requires Node ^22.22 || ^24.15 || >=26, and @latest broke this
+        # exact step in kxco-post-quantum, so an unpinned install is an outage.
+        run: npm install -g npm@11
+
+      - run: npm ci
+      - run: npm test
+
+      - name: Publish
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # The SBOM runs AFTER the publish and cannot fail the job. The package is
+      # already on the registry by this point, so failing here would misreport a
+      # completed release. npm generates it from the tree that was actually
+      # installed for this build rather than a re-resolved one.
+      - name: Generate CycloneDX SBOM
+        continue-on-error: true
+        run: |
+          npm sbom --sbom-format cyclonedx --sbom-type library > sbom.cyclonedx.json
+          node -e "const s=require('./sbom.cyclonedx.json');console.log('components:',s.components.length)"
+
+      # Publish it at a stable, unauthenticated URL:
+      #   https://github.com/<org>/<repo>/releases/download/<tag>/sbom.cyclonedx.json
+      #
+      # gh is preinstalled on the runner, so this adds no third-party action to
+      # pin. --clobber makes a re-dispatch of the same tag idempotent.
+      - name: Publish the SBOM on the GitHub Release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.ref || github.ref_name }}
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 \
+            || gh release create "$TAG" --title "$TAG" --generate-notes
+          gh release upload "$TAG" sbom.cyclonedx.json --clobber
