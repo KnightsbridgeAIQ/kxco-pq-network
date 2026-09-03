@@ -120,6 +120,13 @@ A missing licence throws at **construction**, not at the first write. A service 
 
 ---
 
+## What the buyer is getting
+
+- **A named counterparty.** Four known validators under QBFT proof-of-authority, an operator with a legal entity behind it, and a contract. The question a supervisor asks — who approved this — has an answer here and does not on a permissionless chain.
+- **On-chain post-quantum verification.** Armature L1 verifies ML-DSA-65 in consensus at precompile `0x0b`, executed by every validator, ~50,000 gas.
+- **Category 5 available today.** ML-DSA-87 and ML-KEM-1024, the parameter sets CNSA 2.0 specifies, shipped and ACVP-checked.
+- **Evidence, not assertions.** 2,103 NIST ACVP vectors, a 225-check interoperability matrix, SLSA provenance and a CycloneDX SBOM on every release — all reproducible by the customer.
+
 ## What is not sold
 
 - **Not the cryptography.** It is Apache-2.0 and it is not going to stop being.
