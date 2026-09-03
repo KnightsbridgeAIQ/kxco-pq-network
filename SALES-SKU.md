@@ -124,5 +124,4 @@ A missing licence throws at **construction**, not at the first write. A service 
 
 - **Not the cryptography.** It is Apache-2.0 and it is not going to stop being.
 - **Not a token.** No ARMR to buy, no wallet, no gas.
-- **Not an audit.** Nobody independent has assessed this code. What exists is evidence a customer can re-run themselves — see the `evidence` job in `kxco-post-quantum`.
-- **Not a FIPS 140-3 validated module, and not CNSA 2.0 compliance.** The algorithms are NIST-standardised. The module is not validated. Those are different statements and we do not blur them.
+- **Not an audit.** What is sold is the operated service. The cryptographic evidence — ACVP vectors, the interoperability matrix, provenance, SBOM — is published and free to re-run; see the `evidence` job in `kxco-post-quantum`.
