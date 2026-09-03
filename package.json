@@ -1,0 +1,68 @@
+{
+  "name": "kxco-pq-network",
+  "version": "1.0.0",
+  "description": "Verification modes for KXCO post-quantum envelopes: signature (offline, free), anchored (requires an Armature L1 anchor), and anchored+live (requires a live key-registry lookup). Shared by kxco-pq-sdk, kxco-pq-attest, kxco-post-quantum-webhook and kxco-pq-agent.",
+  "keywords": [
+    "post-quantum",
+    "pqc",
+    "ml-dsa",
+    "verification",
+    "revocation",
+    "key-registry",
+    "anchoring",
+    "armature",
+    "kxco",
+    "identity",
+    "compliance",
+    "fail-closed"
+  ],
+  "license": "Apache-2.0",
+  "author": "Shayne Heffernan and John Heffernan",
+  "contributors": [
+    {
+      "name": "Shayne Heffernan"
+    },
+    {
+      "name": "John Heffernan"
+    }
+  ],
+  "homepage": "https://kxco.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KnightsbridgeAIQ/kxco-pq-network.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KnightsbridgeAIQ/kxco-pq-network/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "SALES-SKU.md",
+    "src"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "dependencies": {
+    "kxco-post-quantum": "^1.6.0"
+  },
+  "scripts": {
+    "test": "node --test --test-timeout=30000 test/network.test.js test/registry.test.js"
+  },
+  "funding": "https://kxco.ai",
+  "publishConfig": {
+    "provenance": true,
+    "access": "public"
+  }
+}
