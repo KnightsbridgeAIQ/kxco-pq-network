@@ -154,19 +154,22 @@ cryptography is deliberate: policy changes without touching a signature path.
 
 **ML-DSA-65** (NIST FIPS 204) via [`kxco-post-quantum`](https://www.npmjs.com/package/kxco-post-quantum), running on the OpenSSL 3.5 primitives where the runtime provides them. No custom cryptography.
 
-Evidenced, and reproducible on your own machine:
+This package adds no cryptography of its own, so the evidence that matters is the
+base package's, and it is reproducible on your own machine:
 
-- **2,103 NIST ACVP vectors** across FIPS 203, 204 and 205, pinned by digest
-- **225 interoperability checks** against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py, in both directions
-- **SLSA provenance** on every published release — verify with `npm audit signatures`
-- **CycloneDX SBOM** published with each release
-- `npm run evidence` regenerates the whole bundle from source
+- **2,103 NIST ACVP vectors (0 failed)** across FIPS 203, 204 and 205, pinned by digest
+- **225 interoperability checks** against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py, in both directions and with negative controls
+- **SLSA provenance** on every [`kxco-post-quantum`](https://www.npmjs.com/package/kxco-post-quantum) release — verify with `npm audit signatures kxco-post-quantum`
+- `npm run evidence` in that package regenerates the whole bundle from source
+
+Third-party dependencies here are pinned to exact versions, never ranges, so the
+code that performs the cryptography cannot change without a release.
 
 Dependency audit history is recorded in [AUDIT.md](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/blob/main/AUDIT.md).
 
 This package adds no cryptography of its own. It decides what a verification mode requires on top of a signature check the caller performed, and it fails closed: an unreachable registry returns invalid, never valid-with-a-warning.
 
-To report a vulnerability, open a [private security advisory](https://github.com/KnightsbridgeAIQ/kxco-pq-network/security/advisories/new) or email **security@kxco.ai**.
+To report a vulnerability, email **security@kxco.ai**.
 
 ---
 

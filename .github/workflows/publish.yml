@@ -12,13 +12,12 @@ on:
         type: string
 
 permissions:
-  # contents: write is needed to attach the SBOM to the GitHub Release. An
-  # Actions artifact is not a published SBOM: it expires on the retention
-  # window and needs an authenticated GitHub session to fetch, so a third party
-  # assessing supply chain posture cannot read it. A release asset is a
-  # permanent unauthenticated URL, which is the thing being claimed.
+  # contents: write is needed to attach the SBOM to the GitHub Release. On a
+  # public repo that gives a permanent unauthenticated URL; on this one it is an
+  # internal record, durable and versioned rather than expiring on the Actions
+  # retention window. Either way it is not something the README offers outward.
   contents: write
-  id-token: write   # required for Trusted Publishing OIDC and --provenance
+  id-token: write   # required for Trusted Publishing OIDC
 
 jobs:
   publish:
@@ -44,18 +43,19 @@ jobs:
       - run: npm ci
       - run: npm test
 
-      # npm tries Trusted Publishing first whenever id-token: write is granted
-      # and the CLI is new enough, and falls back to NODE_AUTH_TOKEN when no
-      # trusted publisher answers. Both paths are wired here deliberately.
+      # No --provenance here, and it is not an oversight. npm will only sign a
+      # provenance bundle for a build whose source repository is public; from a
+      # private one it answers:
       #
-      # Trusted Publishing cannot carry the FIRST release of a package: the
-      # publisher is configured on the package's own settings page, which does
-      # not exist until the package does. Tested, not assumed - an OIDC-only run
-      # of this workflow reached an unauthenticated `E404 PUT` on the registry.
-      # So the first release goes out under the token, and this repo should be
-      # moved to Trusted Publishing after it, the way kxco-post-quantum was.
-      - name: Publish (Trusted Publishing where configured, token otherwise)
-        run: npm publish --access public --provenance
+      #   E422 ... Unsupported GitHub Actions source repository visibility:
+      #   "private". Only public source repositories are supported.
+      #
+      # This repository is private by intent. The package is the artefact that
+      # ships; the history is not. The signed-provenance claim therefore belongs
+      # to kxco-post-quantum, which is public, and the README points there for it
+      # rather than implying it for this package.
+      - name: Publish
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
