@@ -44,17 +44,20 @@ jobs:
       - run: npm ci
       - run: npm test
 
-      # No NODE_AUTH_TOKEN. This publishes under Trusted Publishing: the runner
-      # exchanges its OIDC identity for a short-lived registry credential, so
-      # there is no long-lived secret in this repository to leak or rotate.
+      # npm tries Trusted Publishing first whenever id-token: write is granted
+      # and the CLI is new enough, and falls back to NODE_AUTH_TOKEN when no
+      # trusted publisher answers. Both paths are wired here deliberately.
       #
-      # It also sidesteps a real failure mode. The account requires two-factor
-      # authentication for writes, and a classic publish token does not exempt a
-      # publish from that: npm answers EOTP and waits for a code no CI runner can
-      # supply. OIDC is not subject to it. This is the same mechanism
-      # kxco-post-quantum has published under since it moved off tokens.
-      - name: Publish (Trusted Publishing + provenance via OIDC)
+      # Trusted Publishing cannot carry the FIRST release of a package: the
+      # publisher is configured on the package's own settings page, which does
+      # not exist until the package does. Tested, not assumed - an OIDC-only run
+      # of this workflow reached an unauthenticated `E404 PUT` on the registry.
+      # So the first release goes out under the token, and this repo should be
+      # moved to Trusted Publishing after it, the way kxco-post-quantum was.
+      - name: Publish (Trusted Publishing where configured, token otherwise)
         run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # The SBOM runs AFTER the publish and cannot fail the job. The package is
       # already on the registry by this point, so failing here would misreport a
