@@ -157,8 +157,8 @@ cryptography is deliberate: policy changes without touching a signature path.
 This package adds no cryptography of its own, so the evidence that matters is the
 base package's, and it is reproducible on your own machine:
 
-- **2,103 NIST ACVP vectors (0 failed)** across FIPS 203, 204 and 205, pinned by digest
-- **225 interoperability checks** against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py, in both directions and with negative controls
+- **2,103 NIST ACVP vectors: 1,793 passed, 0 failed, 310 skipped** across FIPS 203, 204 and 205, pinned by digest
+- **225 interoperability checks passed, 0 failed, 42 not applicable** against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py, in both directions and with negative controls
 - **SLSA provenance** on every [`kxco-post-quantum`](https://www.npmjs.com/package/kxco-post-quantum) release — verify with `npm audit signatures kxco-post-quantum`
 - `npm run evidence` in that package regenerates the whole bundle from source
 
