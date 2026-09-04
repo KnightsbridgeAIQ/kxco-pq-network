@@ -1,7 +1,7 @@
 {
   "name": "kxco-pq-network",
-  "version": "1.0.0",
-  "description": "Three levels of proof for KXCO post-quantum envelopes: the signature alone, offline; the signature plus an Armature L1 anchor; and both plus a live key-registry lookup that fails closed. Shared by kxco-pq-sdk, kxco-pq-attest, kxco-post-quantum-webhook and kxco-pq-agent.",
+  "version": "1.0.1",
+  "description": "Three levels of proof for KXCO post-quantum envelopes: the signature alone, offline; the signature plus an Armature L1 anchor; and both plus a live key-registry lookup that fails closed. Shared across the kxco-pq packages.",
   "keywords": [
     "post-quantum",
     "pqc",
