@@ -1,7 +1,7 @@
 {
   "name": "kxco-pq-network",
   "version": "1.0.0",
-  "description": "Verification modes for KXCO post-quantum envelopes: signature (offline, free), anchored (requires an Armature L1 anchor), and anchored+live (requires a live key-registry lookup). Shared by kxco-pq-sdk, kxco-pq-attest, kxco-post-quantum-webhook and kxco-pq-agent.",
+  "description": "Three levels of proof for KXCO post-quantum envelopes: the signature alone, offline; the signature plus an Armature L1 anchor; and both plus a live key-registry lookup that fails closed. Shared by kxco-pq-sdk, kxco-pq-attest, kxco-post-quantum-webhook and kxco-pq-agent.",
   "keywords": [
     "post-quantum",
     "pqc",

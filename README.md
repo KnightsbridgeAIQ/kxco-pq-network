@@ -135,14 +135,14 @@ They emit; they do not aggregate, invoice, or phone home. The default sink is on
 
 ---
 
-## What this does NOT do
+## Where this fits
 
-- No cryptography. It never verifies a signature.
-- No key generation or storage.
-- No relay writes — that is `kxco-pq-chain`.
-- It does not make a signature valid or invalid. It decides what a mode requires **on top of** a signature check you performed.
+This decides what a verification mode *requires* on top of a signature check
+you have already performed. Keeping that decision separate from the
+cryptography is deliberate: policy changes without touching a signature path.
 
----
+- [`kxco-post-quantum`](https://www.npmjs.com/package/kxco-post-quantum) performs the signature check itself
+- [`kxco-pq-chain`](https://www.npmjs.com/package/kxco-pq-chain) performs relay writes
 
 ## Why this is its own package
 
