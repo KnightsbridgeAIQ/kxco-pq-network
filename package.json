@@ -49,7 +49,8 @@
     "LICENSE",
     "README.md",
     "SALES-SKU.md",
-    "src"
+    "src",
+    "ASSESSMENT.md"
   ],
   "engines": {
     "node": ">=20.19"
@@ -58,7 +59,8 @@
     "kxco-post-quantum": "^1.6.0"
   },
   "scripts": {
-    "test": "node --test --test-timeout=30000 test/network.test.js test/registry.test.js"
+    "test": "node --test --test-timeout=30000 test/network.test.js test/registry.test.js",
+    "evidence": "node scripts/build-evidence.mjs"
   },
   "funding": "https://kxco.ai",
   "publishConfig": {
