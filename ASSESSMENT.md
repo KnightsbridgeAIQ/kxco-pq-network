@@ -60,7 +60,14 @@ default TTL, and the README already states the consequence, which is that a
 revoked key stays accepted for up to that window.
 
 **Start and update.** No release signing of its own. Published through CI with
-npm provenance.
+npm provenance from 1.0.3 onward.
+
+1.0.2 and earlier carry no attestation, and the reason is worth recording
+because it was a stale constraint rather than a decision. `--provenance` was
+deliberately omitted while this repository was private, since npm signs
+provenance only for builds from a public source repository. The repository is
+public now. The flag outlived the reason for it, and 1.0.2 shipped without an
+attestation it could have had.
 
 ## Agility
 

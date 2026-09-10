@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.3
+
+This release carries a SLSA provenance attestation. No source change.
+
+**`--provenance` is back on.** It was deliberately omitted while this repository
+was private, because npm signs provenance only for builds from a public source
+repository and a private one is refused with `E422 ... Unsupported GitHub
+Actions source repository visibility`. The repository is public now, so the
+constraint is gone. The flag outlived the reason for it, and 1.0.2 shipped
+without an attestation it could have had.
+
+Verify it with `npm audit signatures kxco-pq-network`. Until now the README
+pointed at `kxco-post-quantum` for the provenance claim, because that was the
+only package in the pair that could make it. This one makes its own from here.
+
 ## 1.0.2
 
 Documentation and a dependency refresh. No source change.

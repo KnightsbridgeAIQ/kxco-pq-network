@@ -43,19 +43,19 @@ jobs:
       - run: npm ci
       - run: npm test
 
-      # No --provenance here, and it is not an oversight. npm will only sign a
-      # provenance bundle for a build whose source repository is public; from a
-      # private one it answers:
+      # --provenance is on. It was previously left off because npm will only
+      # sign a provenance bundle for a build whose source repository is public,
+      # and this repository was private, which produced:
       #
       #   E422 ... Unsupported GitHub Actions source repository visibility:
       #   "private". Only public source repositories are supported.
       #
-      # This repository is private by intent. The package is the artefact that
-      # ships; the history is not. The signed-provenance claim therefore belongs
-      # to kxco-post-quantum, which is public, and the README points there for it
-      # rather than implying it for this package.
+      # This repository is public now, so that constraint is gone and the
+      # package can carry its own attestation rather than pointing at
+      # kxco-post-quantum's. 1.0.2 shipped without one because the flag outlived
+      # the reason for it.
       - name: Publish
-        run: npm publish --access public
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

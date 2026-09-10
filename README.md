@@ -160,7 +160,12 @@ base package's, and it is reproducible on your own machine:
 - **2,103 NIST ACVP vectors: 1,793 passed, 0 failed, 310 skipped** across FIPS 203, 204 and 205, pinned by digest
 - **225 interoperability checks passed, 0 failed, 42 not applicable** against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py, in both directions and with negative controls
 - **SLSA provenance** on every [`kxco-post-quantum`](https://www.npmjs.com/package/kxco-post-quantum) release — verify with `npm audit signatures kxco-post-quantum`
-- `npm run evidence` in that package regenerates the whole bundle from source
+
+This package carries its own evidence too, and from 1.0.3 its own attestation:
+
+- **SLSA provenance on this package**, from 1.0.3 onward — verify with `npm audit signatures kxco-pq-network`
+- `npm run evidence` here records what only this package can say: identity, its own tests, its SBOM, registry signature verification, and the `kxco-post-quantum` version actually installed rather than the range declared
+- `npm run evidence` in the base package regenerates the conformance bundle from source
 
 Third-party dependencies here are pinned to exact versions, never ranges, so the
 code that performs the cryptography cannot change without a release.
