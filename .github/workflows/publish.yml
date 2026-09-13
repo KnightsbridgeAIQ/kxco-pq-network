@@ -54,10 +54,16 @@ jobs:
       # package can carry its own attestation rather than pointing at
       # kxco-post-quantum's. 1.0.2 shipped without one because the flag outlived
       # the reason for it.
+      # No NODE_AUTH_TOKEN. This step used to carry a long-lived NPM_TOKEN as a
+      # bootstrap fallback, described in a comment as safe to leave because the
+      # npm CLI ignores it when OIDC succeeds. It is not safe to leave: a token
+      # that can publish without a second factor is exactly what npm is removing
+      # (account changes Aug 2026, direct publish Jan 2027), and while it sat here
+      # any run that failed OIDC would silently fall back to it. Two packages in
+      # this family were published under the user account rather than through
+      # Actions for that reason. Trusted Publishing is now the only path in.
       - name: Publish
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # The SBOM runs AFTER the publish and cannot fail the job. The package is
       # already on the registry by this point, so failing here would misreport a
