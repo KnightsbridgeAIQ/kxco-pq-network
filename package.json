@@ -1,7 +1,7 @@
 {
   "name": "kxco-pq-network",
-  "version": "1.0.4",
-  "description": "Three levels of proof for KXCO post-quantum envelopes: the signature alone, offline; the signature plus an Armature L1 anchor; and both plus a live key-registry lookup that fails closed. Shared across the kxco-pq packages.",
+  "version": "1.0.5",
+  "description": "Three levels of proof for post-quantum envelopes: the signature offline, an Armature L1 anchor offline, and a live key-registry check that catches a revoked key and fails closed. Shared across the kxco-pq packages.",
   "keywords": [
     "post-quantum",
     "pqc",
@@ -14,7 +14,15 @@
     "kxco",
     "identity",
     "compliance",
-    "fail-closed"
+    "fail-closed",
+    "pqc-migration",
+    "crypto-agility",
+    "digital-signature",
+    "non-repudiation",
+    "tamper-evident",
+    "key-revocation",
+    "signature-verification",
+    "air-gapped"
   ],
   "license": "Apache-2.0",
   "author": "Shayne Heffernan and John Heffernan",

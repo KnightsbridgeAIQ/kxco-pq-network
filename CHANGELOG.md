@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.5
+
+Documentation. No source change.
+
+**The npm page leads with what the package proves.** The first screen now sets
+out the three levels of proof, from a signature checked offline to a live
+registry answer that fails closed by design, the evidence underneath and the
+migration dates set by NIST, Executive Order 14412, OMB M-26-15 and the UK NCSC.
+
+A family table maps every KXCO package to the job it does, and a new For
+institutions section sets out the operated services and how to reach us. The
+evidence documents are unchanged and linked from the page.
+
+The registry section describes the live endpoint at `chain.kxco.ai/kids/<kid>`,
+which answers in the shape this client reads.
+
+Every GitHub Action in CI is now pinned by commit SHA, as the page states.
+
 ## 1.0.4
 
 Documentation. No source change.
