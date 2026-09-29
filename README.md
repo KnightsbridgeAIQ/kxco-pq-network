@@ -239,7 +239,7 @@ To report a vulnerability, email **security@kxco.ai**.
 
 ## License
 
-Apache-2.0. Use of the hosted registry, relay and anchoring service is governed separately, by [LICENCE-PRODUCT.md](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/blob/main/LICENCE-PRODUCT.md).
+Apache-2.0 © 2026 Knightsbridge Financial Ltd, trading as KXCO. See [LICENSE](./LICENSE) and [NOTICE](./NOTICE). Use of the hosted registry, relay and anchoring service is governed separately, by [LICENCE-PRODUCT.md](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/blob/main/LICENCE-PRODUCT.md).
 
 ---
 

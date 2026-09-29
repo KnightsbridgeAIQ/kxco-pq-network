@@ -1,6 +1,6 @@
 {
   "name": "kxco-pq-network",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Three levels of proof for post-quantum envelopes: the signature offline, an Armature L1 anchor offline, and a live key-registry check that catches a revoked key and fails closed. Shared across the kxco-pq packages.",
   "keywords": [
     "post-quantum",
@@ -55,6 +55,7 @@
   "files": [
     "CHANGELOG.md",
     "LICENSE",
+    "NOTICE",
     "README.md",
     "SALES-SKU.md",
     "src",

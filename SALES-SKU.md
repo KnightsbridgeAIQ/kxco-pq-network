@@ -4,7 +4,7 @@ What is sold, how it is counted, and where in the code the counting happens.
 
 Prices are **USD, per seat, per year**, invoiced. No customer holds ARMR, runs a node, sets a gas price or touches a wallet. If that changes, this document is wrong and should be corrected rather than quietly reinterpreted.
 
-Commercial terms: **hello@kxco.ai**
+Commercial terms: **admin@kxco.ai**
 
 ---
 
