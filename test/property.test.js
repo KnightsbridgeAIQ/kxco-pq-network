@@ -164,7 +164,7 @@ test('anchored+live: a registry that cannot be reached, or answers with somethin
     fc.constant(() => { throw new Error() }),
     fc.string().map((m) => () => { throw new TypeError(m) }),
     fc.constant(() => { throw new DOMException('aborted', 'AbortError') }),
-    fc.anything().filter((v) => v != null).map((v) => () => { throw v }),
+    fc.oneof(fc.constantFrom(null, undefined), fc.anything()).map((v) => () => { throw v }),
     fc.string().map((m) => () => Promise.reject(new Error(m))),
     // A 200 whose body is not JSON, whatever it claims to be.
     fc.tuple(fc.string(), fc.constantFrom('application/json', 'text/html', 'text/plain', ''))
@@ -180,6 +180,9 @@ test('anchored+live: a registry that cannot be reached, or answers with somethin
     fc.stringMatching(/^[0-9a-f]{16}$/).filter((k) => k !== KID).map((k) => json({ kid: k, status: 'active' })),
     fc.oneof(fc.string().filter((k) => k !== KID), fc.constant(undefined)).map((k) => json({ kid: k, status: 'active' })),
     otherChain.map((c) => json({ kid: KID, status: 'active', chainId: c })),
+    // Objects where text belongs, including one that cannot be turned into text.
+    fc.oneof(fc.constant({ toString: null }), fc.dictionary(fc.string(), fc.jsonValue({ maxDepth: 1 })))
+      .chain((o) => fc.constantFrom(json({ kid: o, status: 'active' }), json({ kid: KID, status: 'active', chainId: o }))),
   )
   await fc.assert(fc.asyncProperty(failure, async (respond) => {
     const r = await applyVerifyMode({
@@ -210,8 +213,9 @@ test('anchored+live: only an active status passes, and any status outside the fo
     fc.jsonValue({ maxDepth: 1 }),
   )
   const REASON = { revoked: FAILURE.KID_REVOKED, rotated: FAILURE.KID_ROTATED, expired: FAILURE.KID_EXPIRED }
-  await fc.assert(fc.asyncProperty(status, fc.constantFrom(CHAIN_ID, undefined), async (s, chainId) => {
-    const body = JSON.stringify({ kid: KID, status: s, chainId })
+  const rotatedTo = fc.oneof(fc.constant(undefined), fc.constant({ toString: null }), fc.jsonValue({ maxDepth: 1 }))
+  await fc.assert(fc.asyncProperty(status, fc.constantFrom(CHAIN_ID, undefined), rotatedTo, async (s, chainId, to) => {
+    const body = JSON.stringify({ kid: KID, status: s, chainId, rotatedTo: to })
     const registry = registryAnswering(() => new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }))
     const r = await applyVerifyMode({
       envelope: { chainId: CHAIN_ID, anchor: { txHash: `0x${'ef'.repeat(32)}` } },
@@ -220,7 +224,8 @@ test('anchored+live: only an active status passes, and any status outside the fo
     // What the registry actually said, after the JSON round trip.
     const said = JSON.parse(body).status
     if (said === 'active') return r.valid === true && r.registry.status === 'active'
-    return r.valid === false && r.reason === (REASON[KID_STATUS.includes(said) ? said : ''] ?? FAILURE.KID_UNKNOWN)
+    return r.valid === false && typeof r.detail === 'string' &&
+      r.reason === (REASON[KID_STATUS.includes(said) ? said : ''] ?? FAILURE.KID_UNKNOWN)
   }), PURE)
 })
 
@@ -235,19 +240,22 @@ test('anchored+live: a JSON 404 is the registry answering, and is refused as kid
   }), { numRuns: 200 })
 })
 
-test('anchored+live: whatever a registry object reports, nothing but an active status ever passes', async () => {
-  await fc.assert(fc.asyncProperty(fc.anything(), async (s) => {
-    let r
-    try {
-      r = await applyVerifyMode({
-        envelope: { chainId: CHAIN_ID, anchor: { txHash: `0x${'34'.repeat(32)}` } },
-        signatureValid: true, kid: KID, config: config('anchored+live'), registry: countingRegistry({ kid: KID, status: s }),
-      })
-    } catch {
-      // A rejection is not a pass.
-      return s !== 'active'
-    }
-    return r.valid === (s === 'active')
+test('anchored+live: whatever a registry object reports, it never throws, only an active status passes, and every refusal names one of the package reasons', async () => {
+  // Anything at all, with the names every plain object inherits, the four
+  // statuses and an object that cannot be turned into text drawn often.
+  const reported = fc.oneof(
+    fc.anything(),
+    fc.constantFrom('toString', 'constructor', '__proto__', 'hasOwnProperty', 'valueOf', ...KID_STATUS, { toString: null }),
+  )
+  const REASONS = Object.values(FAILURE)
+  await fc.assert(fc.asyncProperty(reported, reported, async (s, to) => {
+    const r = await applyVerifyMode({
+      envelope: { chainId: CHAIN_ID, anchor: { txHash: `0x${'34'.repeat(32)}` } },
+      signatureValid: true, kid: KID, config: config('anchored+live'),
+      registry: countingRegistry({ kid: KID, status: s, rotatedTo: to }),
+    })
+    if (s === 'active') return r.valid === true
+    return r.valid === false && REASONS.includes(r.reason) && typeof r.detail === 'string'
   }), PURE)
 })
 

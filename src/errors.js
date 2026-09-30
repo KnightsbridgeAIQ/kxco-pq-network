@@ -18,6 +18,23 @@ export class KxcoPqNetworkError extends Error {
 }
 
 /**
+ * A value a registry or a fetch supplied, as text for a message. Such a value
+ * can be anything, including an object that cannot be turned into a string,
+ * and describing it must never be the thing that throws. Not exported from
+ * the package.
+ *
+ * @param {unknown} value
+ * @returns {string}
+ */
+export function text(value) {
+  try {
+    return String(value)
+  } catch {
+    return typeof value
+  }
+}
+
+/**
  * Reasons a verification failed. A caller that treats every one of these the
  * same way is running a weaker check than it thinks it is.
  */

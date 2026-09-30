@@ -20,7 +20,7 @@
 // verification.
 
 import { kidEquals } from 'kxco-post-quantum'
-import { KxcoPqNetworkError } from './errors.js'
+import { KxcoPqNetworkError, text } from './errors.js'
 import { CHAIN_ID } from './config.js'
 
 // Whether a response claims to be JSON. Used to tell a registry answering from
@@ -135,10 +135,11 @@ export class KeyRegistry {
         signal: ac.signal,
       })
     } catch (err) {
+      // A fetchImpl may reject with anything, null and undefined included.
       throw new KxcoPqNetworkError(
-        err.name === 'AbortError'
+        err?.name === 'AbortError'
           ? `registry lookup timed out after ${this.#timeoutMs}ms`
-          : `registry unreachable: ${err.message}`,
+          : `registry unreachable: ${text(err?.message)}`,
         { code: 'REGISTRY_UNREACHABLE', cause: err },
       )
     } finally {
@@ -202,14 +203,14 @@ export class KeyRegistry {
     // either broken or being interposed. Either way the answer is unusable.
     if (typeof body.kid !== 'string' || !kidEquals(body.kid, kid)) {
       throw new KxcoPqNetworkError(
-        `registry answered for kid '${body.kid}' but was asked about '${kid}'`,
+        `registry answered for kid '${text(body.kid)}' but was asked about '${kid}'`,
         { code: 'REGISTRY_BAD_RECORD' },
       )
     }
 
     if (body.chainId !== undefined && body.chainId !== CHAIN_ID) {
       throw new KxcoPqNetworkError(
-        `registry record names chain ${body.chainId}, expected ${CHAIN_ID}`,
+        `registry record names chain ${text(body.chainId)}, expected ${CHAIN_ID}`,
         { code: 'WRONG_CHAIN' },
       )
     }

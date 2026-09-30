@@ -246,6 +246,52 @@ test('a registry timeout also fails closed', async (t) => {
   assert.equal(result.reason, FAILURE.REGISTRY_UNREACHABLE)
 })
 
+// A fetch that rejects with no error at all, or a record carrying objects
+// where the registry's text belongs, is still a registry that could not be read.
+test('anchored+live fails closed when fetch rejects with nothing, or a record carries objects where text belongs', async () => {
+  const live = (fetchImpl) => networkConfig({
+    verifyMode: 'anchored+live', registryUrl: 'http://registry.invalid', licenceKey: LICENCE, registryTtlMs: 0, fetchImpl,
+  })
+  const json = (body) => async () => new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' } })
+  const unreadable = [
+    async () => { throw null },
+    async () => { throw undefined },
+    json({ kid: { toString: null }, status: 'active' }),
+    json({ kid: KID, status: 'active', chainId: { toString: null } }),
+  ]
+  for (const fetchImpl of unreadable) {
+    const result = await applyVerifyMode({ envelope: anchored(), signatureValid: true, kid: KID, config: live(fetchImpl) })
+    assert.equal(result.valid, false)
+    assert.equal(result.reason, FAILURE.REGISTRY_UNREACHABLE)
+    assert.equal(typeof result.detail, 'string')
+  }
+
+  // A rotation whose successor is not text is still a rotation.
+  const rotated = await applyVerifyMode({
+    envelope: anchored(), signatureValid: true, kid: KID,
+    config: live(json({ kid: KID, status: 'rotated', rotatedTo: { toString: null } })),
+  })
+  assert.equal(rotated.valid, false)
+  assert.equal(rotated.reason, FAILURE.KID_ROTATED)
+  assert.equal(typeof rotated.detail, 'string')
+})
+
+// KeyRegistry only ever reports one of its own statuses. A registry object
+// made by hand can report anything, and whatever it reports fails closed with
+// one of this package's reasons rather than escaping as a TypeError.
+test('a hand-made registry reporting a built-in property name or a non-string status fails closed as kid_unknown', async () => {
+  for (const status of ['toString', 'constructor', '__proto__', 'hasOwnProperty', { toString: null }, ['revoked']]) {
+    const result = await applyVerifyMode({
+      envelope: anchored(), signatureValid: true, kid: KID,
+      config: networkConfig({ verifyMode: 'anchored+live', licenceKey: LICENCE }),
+      registry: { async lookup() { return { kid: KID, status } } },
+    })
+    assert.equal(result.valid, false, JSON.stringify(status))
+    assert.equal(result.reason, FAILURE.KID_UNKNOWN, JSON.stringify(status))
+    assert.equal(typeof result.detail, 'string', JSON.stringify(status))
+  }
+})
+
 test('anchored+live without a licence key fails, and points at anchored', async () => {
   const result = await applyVerifyMode({
     envelope: anchored(), signatureValid: true, kid: KID,
