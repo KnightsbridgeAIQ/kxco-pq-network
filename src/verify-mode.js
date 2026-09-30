@@ -12,7 +12,7 @@
 // the two lead a reader to different conclusions about what happened.
 
 import { CHAIN_ID } from './config.js'
-import { FAILURE, KxcoPqNetworkError } from './errors.js'
+import { FAILURE, KxcoPqNetworkError, text } from './errors.js'
 import { KeyRegistry } from './registry.js'
 
 /**
@@ -128,15 +128,32 @@ export async function applyVerifyMode({ envelope, signatureValid, kid, config, r
     }
   }
 
+  // A registry object made by hand can answer with nothing at all. That is no
+  // answer about the key, so it fails closed the same way.
+  if (record === null || typeof record !== 'object' || Array.isArray(record)) {
+    return {
+      valid: false,
+      mode,
+      reason: FAILURE.REGISTRY_UNREACHABLE,
+      detail: 'registry returned no record. anchored+live fails closed; use anchored for an offline answer.',
+      anchor,
+    }
+  }
+
   if (record.status === 'active') {
     return { valid: true, mode, anchor, registry: record }
   }
 
-  const reason = {
+  // Own keys, and only for a string status: a registry object made by hand can
+  // report `toString` or an object, and neither is one of the statuses below.
+  const REASONS = {
     revoked: FAILURE.KID_REVOKED,
     rotated: FAILURE.KID_ROTATED,
     expired: FAILURE.KID_EXPIRED,
-  }[record.status] ?? FAILURE.KID_UNKNOWN
+  }
+  const reason = typeof record.status === 'string' && Object.hasOwn(REASONS, record.status)
+    ? REASONS[record.status]
+    : FAILURE.KID_UNKNOWN
 
   return {
     valid: false,
@@ -144,8 +161,8 @@ export async function applyVerifyMode({ envelope, signatureValid, kid, config, r
     reason,
     detail:
       record.status === 'rotated' && record.rotatedTo
-        ? `kid ${kid} was rotated to ${record.rotatedTo}`
-        : `registry reports kid ${kid} as ${record.status}`,
+        ? `kid ${kid} was rotated to ${text(record.rotatedTo)}`
+        : `registry reports kid ${kid} as ${text(record.status)}`,
     anchor,
     registry: record,
   }
