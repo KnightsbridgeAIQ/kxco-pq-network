@@ -128,6 +128,18 @@ export async function applyVerifyMode({ envelope, signatureValid, kid, config, r
     }
   }
 
+  // A registry object made by hand can answer with nothing at all. That is no
+  // answer about the key, so it fails closed the same way.
+  if (record === null || typeof record !== 'object' || Array.isArray(record)) {
+    return {
+      valid: false,
+      mode,
+      reason: FAILURE.REGISTRY_UNREACHABLE,
+      detail: 'registry returned no record. anchored+live fails closed; use anchored for an offline answer.',
+      anchor,
+    }
+  }
+
   if (record.status === 'active') {
     return { valid: true, mode, anchor, registry: record }
   }

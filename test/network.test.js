@@ -292,6 +292,19 @@ test('a hand-made registry reporting a built-in property name or a non-string st
   }
 })
 
+test('a hand-made registry whose lookup returns no record fails closed as registry_unreachable', async () => {
+  for (const record of [null, undefined, 5, 'active', true, ['active']]) {
+    const result = await applyVerifyMode({
+      envelope: anchored(), signatureValid: true, kid: KID,
+      config: networkConfig({ verifyMode: 'anchored+live', licenceKey: LICENCE }),
+      registry: { async lookup() { return record } },
+    })
+    assert.equal(result.valid, false, JSON.stringify(record))
+    assert.equal(result.reason, FAILURE.REGISTRY_UNREACHABLE, JSON.stringify(record))
+    assert.equal(typeof result.detail, 'string', JSON.stringify(record))
+  }
+})
+
 test('anchored+live without a licence key fails, and points at anchored', async () => {
   const result = await applyVerifyMode({
     envelope: anchored(), signatureValid: true, kid: KID,
