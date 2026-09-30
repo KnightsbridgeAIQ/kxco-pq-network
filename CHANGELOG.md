@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7
+
+anchored+live fails closed with the package's own reasons when fetch rejects
+with no error, when a registry lookup returns no record, or when a registry
+reports a status or field that is not text.
+
 ## 1.0.6
 
 Documentation. No source change.
