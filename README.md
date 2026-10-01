@@ -233,7 +233,7 @@ Dependency audit history is recorded in [AUDIT.md](https://github.com/Knightsbri
 
 Every signature check stays with the package that made the envelope. This decides what a verification mode requires on top of it, and it fails closed: an unreachable registry returns invalid.
 
-To report a vulnerability, email **security@kxco.ai**.
+To report a vulnerability, use [private vulnerability reporting](https://github.com/KnightsbridgeAIQ/kxco-pq-network/security/advisories/new) on this repository, or email **admin@kxco.ai**.
 
 ---
 
