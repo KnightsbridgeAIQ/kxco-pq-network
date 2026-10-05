@@ -21,7 +21,7 @@ export {
   DEFAULT_REGISTRY_TTL_MS,
 } from './config.js'
 
-export { KeyRegistry, KID_STATUS } from './registry.js'
+export { KeyRegistry, KID_STATUS, DEFAULT_ALG } from './registry.js'
 export { applyVerifyMode, readAnchor } from './verify-mode.js'
 export { KxcoPqNetworkError, FAILURE } from './errors.js'
 export { meter, usageEvent, licencePrefix, EVENTS } from './meter.js'

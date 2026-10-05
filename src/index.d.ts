@@ -66,9 +66,19 @@ export type KidStatus = 'active' | 'revoked' | 'rotated' | 'expired' | 'unknown'
 
 export const KID_STATUS: ['active', 'revoked', 'rotated', 'expired']
 
+/** What a registry record without an `alg` field means. */
+export const DEFAULT_ALG: 'ML-DSA-65'
+
 export interface KidRecord {
   kid: string
   status: KidStatus
+  /**
+   * The ML-DSA parameter set the registry holds the key under, normally
+   * `'ML-DSA-65'` or `'ML-DSA-87'`. Set on every record the registry returned:
+   * one without the field is ML-DSA-65. Absent only on an `unknown` answer.
+   * A name this build does not know is passed through and matches no key.
+   */
+  alg?: string
   publicKey?: string
   rotatedTo?: string | null
   institutionId?: string
@@ -103,6 +113,7 @@ export const FAILURE: {
   KID_ROTATED: 'kid_rotated'
   KID_EXPIRED: 'kid_expired'
   KID_UNKNOWN: 'kid_unknown'
+  ALG_MISMATCH: 'alg_mismatch'
   REGISTRY_UNREACHABLE: 'registry_unreachable'
   LICENCE_REQUIRED: 'licence_required'
 }
@@ -141,6 +152,13 @@ export function applyVerifyMode(opts: {
   config: NetworkConfig
   /** Pass one to share its cache across verifications. */
   registry?: KeyRegistry
+  /**
+   * The ML-DSA parameter set the signature was verified under, which the key
+   * decides. In `anchored+live` an active record holding a different set is
+   * refused with `alg_mismatch`, as is an envelope `alg` that disagrees.
+   * Omitted, with no envelope `alg`, it means ML-DSA-65.
+   */
+  alg?: 'ML-DSA-65' | 'ML-DSA-87'
 }): Promise<VerifyModeResult>
 
 // ── errors and metering ─────────────────────────────────────────────────────

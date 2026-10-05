@@ -45,6 +45,12 @@ function isJson(response) {
  */
 export const KID_STATUS = ['active', 'revoked', 'rotated', 'expired']
 
+/**
+ * What a registry record without an `alg` field means. Every key registered
+ * before the field existed is ML-DSA-65.
+ */
+export const DEFAULT_ALG = 'ML-DSA-65'
+
 export class KeyRegistry {
   #url
   #ttlMs
@@ -81,7 +87,7 @@ export class KeyRegistry {
    * Look a kid up, through the cache.
    *
    * @param {string} kid
-   * @returns {Promise<{ kid: string, status: string, publicKey?: string,
+   * @returns {Promise<{ kid: string, status: string, alg?: string, publicKey?: string,
    *                     rotatedTo?: string|null, institutionId?: string,
    *                     chainId?: number, asOfBlock?: number, cached: boolean }>}
    * @throws {KxcoPqNetworkError} if the registry cannot be reached or answers badly
@@ -219,9 +225,22 @@ export class KeyRegistry {
     // out of the "is it active" check as though it were active.
     const status = KID_STATUS.includes(body.status) ? body.status : 'unknown'
 
+    // The ML-DSA parameter set the registry holds for this key. A record with
+    // no `alg` predates the field, when every registered key was ML-DSA-65,
+    // so that is what it means. A name this build does not know is passed
+    // through as given: it matches no key, so anchored+live refuses it rather
+    // than reading it as either set.
+    if (body.alg !== undefined && typeof body.alg !== 'string') {
+      throw new KxcoPqNetworkError(
+        `registry record for '${kid}' has a non-string alg`,
+        { code: 'REGISTRY_BAD_RECORD' },
+      )
+    }
+
     return {
       kid,
       status,
+      alg: body.alg ?? DEFAULT_ALG,
       publicKey: body.publicKey,
       rotatedTo: body.rotatedTo ?? null,
       institutionId: body.institutionId,
