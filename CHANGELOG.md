@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+**Registry records carry the algorithm.** `KidRecord` gains `alg`, the ML-DSA
+parameter set the registry holds the key under (`ML-DSA-65` or `ML-DSA-87`). A
+record without the field means ML-DSA-65, since every key registered before it
+existed is one, and `KeyRegistry.lookup()` returns it that way. A non-string
+`alg` is a malformed record (`REGISTRY_BAD_RECORD`). New export: `DEFAULT_ALG`.
+
+**`anchored+live` refuses a set mismatch.** `applyVerifyMode()` takes an
+optional `alg`, the parameter set the caller verified the signature under. On an
+active record, if that or the envelope's `alg` disagrees with the record's, the
+result is invalid with the new reason `alg_mismatch` (`FAILURE.ALG_MISMATCH`).
+A caller that passes neither is taken to have verified ML-DSA-65, so every
+existing integration verifying an ML-DSA-65 key behaves as before. Revoked,
+rotated, expired and unknown keys keep their own reasons.
+
 ## 1.0.6
 
 Documentation. No source change.

@@ -38,6 +38,11 @@ export const FAILURE = {
   KID_EXPIRED: 'kid_expired',
   /** The registry has never heard of this key. */
   KID_UNKNOWN: 'kid_unknown',
+  /**
+   * The registry holds this key under a different ML-DSA parameter set from
+   * the one the key or the envelope is. A record with no `alg` means ML-DSA-65.
+   */
+  ALG_MISMATCH: 'alg_mismatch',
   /** The registry could not be reached. Fails closed — see verifyEnvelope. */
   REGISTRY_UNREACHABLE: 'registry_unreachable',
   /** The mode needs a licence key and none was configured. */

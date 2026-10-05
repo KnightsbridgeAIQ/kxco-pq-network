@@ -13,7 +13,7 @@
 
 import { CHAIN_ID } from './config.js'
 import { FAILURE, KxcoPqNetworkError } from './errors.js'
-import { KeyRegistry } from './registry.js'
+import { KeyRegistry, DEFAULT_ALG } from './registry.js'
 
 /**
  * Read the anchor out of an envelope, whichever of the two shapes it uses.
@@ -52,10 +52,14 @@ export function readAnchor(envelope) {
  * @param {string}  opts.kid             — the signing kid
  * @param {object}  opts.config          — from networkConfig()
  * @param {KeyRegistry} [opts.registry]  — reuse one to share its cache
+ * @param {string}  [opts.alg]           The ML-DSA parameter set the caller
+ *   verified the signature under, which the key decides. Omitted, with no
+ *   `alg` on the envelope either, it means ML-DSA-65, which is what every
+ *   caller verified before the field existed.
  * @returns {Promise<{ valid: boolean, mode: string, reason?: string,
  *                     detail?: string, anchor?: object, registry?: object }>}
  */
-export async function applyVerifyMode({ envelope, signatureValid, kid, config, registry }) {
+export async function applyVerifyMode({ envelope, signatureValid, kid, config, registry, alg }) {
   const mode = config.verifyMode
 
   if (!signatureValid) {
@@ -129,6 +133,26 @@ export async function applyVerifyMode({ envelope, signatureValid, kid, config, r
   }
 
   if (record.status === 'active') {
+    // The record must describe this key as the parameter set it is. The kid is
+    // a fingerprint, so a record for the right kid under the wrong set is a
+    // registry that is wrong or interposed, or an envelope claiming a set its
+    // key is not; either way the answer cannot be relied on. Checked only on
+    // an active record, so revoked, rotated and unknown keep their own reasons.
+    const held = record.alg ?? DEFAULT_ALG
+    const claims = [['key', alg], ['envelope', envelope?.alg]].filter(([, v]) => v !== undefined)
+    if (claims.length === 0) claims.push(['key', DEFAULT_ALG])
+    const disagreeing = claims.find(([, v]) => v !== held)
+    if (disagreeing) {
+      const [source, value] = disagreeing
+      return {
+        valid: false,
+        mode,
+        reason: FAILURE.ALG_MISMATCH,
+        detail: `the registry holds kid ${kid} as ${held}, but the ${source} is ${value}`,
+        anchor,
+        registry: record,
+      }
+    }
     return { valid: true, mode, anchor, registry: record }
   }
 

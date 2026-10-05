@@ -151,6 +151,7 @@ The registry at `https://chain.kxco.ai` answers from the `KXCOIdentityRegistry` 
 {
   "kid": "aa29f37ab7f4b2cf",
   "publicKey": "<hex or jwk>",
+  "alg": "ML-DSA-87",
   "status": "active",
   "rotatedTo": null,
   "institutionId": "org_...",
@@ -162,6 +163,10 @@ The registry at `https://chain.kxco.ai` answers from the `KXCOIdentityRegistry` 
 `status` is `active`, `revoked`, `rotated` or `expired`. **Any other value is treated as `unknown`**, so only `active` ever passes the check.
 
 A record must name the `kid` that was asked for, compared in constant time, so a misrouted or interposed answer is refused.
+
+`alg` is the ML-DSA parameter set the registry holds the key under: `ML-DSA-65` or `ML-DSA-87`. **A record without `alg` means `ML-DSA-65`**, because every key registered before the field existed is one, so `KidRecord.alg` is always set on a record the registry returned. A non-string `alg` makes the record malformed. A name this build does not know is passed through unchanged and matches no key. The chain stores a hash of each key, which cannot say which set it is, so the registry learns `alg` when the key itself is presented to `POST /kids/:kid/key` with a signature proving possession; until then the record carries no `alg`.
+
+In `anchored+live`, an active record must agree with the key that signed. Pass `alg`, the parameter set you verified the signature under (the key decides it), to `applyVerifyMode`; an `alg` on the envelope is checked as well. If either disagrees with the record the result is invalid with the reason `alg_mismatch`. With neither, the caller is taken to have verified ML-DSA-65, as every caller did before the field existed. Revoked, rotated, expired and unknown keys keep their own reasons.
 
 The registry read is metered where a licence is configured and rate-limited where one is not. Reads without a licence are allowed, which is how the free path stays free.
 
