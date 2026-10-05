@@ -1,7 +1,6 @@
 # Changelog
 
-## Unreleased
-
+## 1.1.0
 **Registry records carry the algorithm.** `KidRecord` gains `alg`, the ML-DSA
 parameter set the registry holds the key under (`ML-DSA-65` or `ML-DSA-87`). A
 record without the field means ML-DSA-65, since every key registered before it
