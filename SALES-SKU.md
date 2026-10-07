@@ -44,7 +44,7 @@ Counted as **distinct agent kids ever registered**, not concurrent. A kid revoke
 
 ### 4. Webhook verified
 
-Outbound deliveries signed with ML-DSA-65, and the optional compact-JWS path, from `kxco-post-quantum-webhook`.
+Outbound deliveries signed with ML-DSA-87 or ML-DSA-65, and the optional compact-JWS path, from `kxco-post-quantum-webhook`.
 
 **Signing and verifying webhooks needs no licence.** The package is Apache-2.0 and does not call anything. What is sold here is the hosted key-rotation endpoint and the registry lookup that lets a receiver confirm a signing kid is still current, which is the part a receiver cannot do for themselves.
 

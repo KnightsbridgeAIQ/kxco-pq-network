@@ -47,7 +47,9 @@ export const KID_STATUS = ['active', 'revoked', 'rotated', 'expired']
 
 /**
  * What a registry record without an `alg` field means. Every key registered
- * before the field existed is ML-DSA-65.
+ * before the field existed is ML-DSA-65. It interprets only what predates the
+ * field, a record or a caller that names no set, and never picks the set for a
+ * new key, which the key's length decides.
  */
 export const DEFAULT_ALG = 'ML-DSA-65'
 

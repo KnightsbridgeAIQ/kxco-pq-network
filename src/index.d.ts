@@ -66,7 +66,11 @@ export type KidStatus = 'active' | 'revoked' | 'rotated' | 'expired' | 'unknown'
 
 export const KID_STATUS: ['active', 'revoked', 'rotated', 'expired']
 
-/** What a registry record without an `alg` field means. */
+/**
+ * What a registry record without an `alg` field means. It interprets only what
+ * predates the field, a record or a caller that names no set, and never picks
+ * the set for a new key, which the key's length decides.
+ */
 export const DEFAULT_ALG: 'ML-DSA-65'
 
 export interface KidRecord {
@@ -74,7 +78,7 @@ export interface KidRecord {
   status: KidStatus
   /**
    * The ML-DSA parameter set the registry holds the key under, normally
-   * `'ML-DSA-65'` or `'ML-DSA-87'`. Set on every record the registry returned:
+   * `'ML-DSA-87'` or `'ML-DSA-65'`. Set on every record the registry returned:
    * one without the field is ML-DSA-65. Absent only on an `unknown` answer.
    * A name this build does not know is passed through and matches no key.
    */
@@ -158,7 +162,7 @@ export function applyVerifyMode(opts: {
    * refused with `alg_mismatch`, as is an envelope `alg` that disagrees.
    * Omitted, with no envelope `alg`, it means ML-DSA-65.
    */
-  alg?: 'ML-DSA-65' | 'ML-DSA-87'
+  alg?: 'ML-DSA-87' | 'ML-DSA-65'
 }): Promise<VerifyModeResult>
 
 // ── errors and metering ─────────────────────────────────────────────────────

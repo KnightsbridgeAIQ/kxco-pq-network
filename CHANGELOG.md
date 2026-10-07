@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.1 (2026-10-07)
+
+Documentation. No source change.
+
+ML-DSA-87 is the parameter set KXCO recommends for every new key, so the README,
+the type declarations and SALES-SKU.md name it first wherever they name both
+sets. The Security section names ML-DSA-87 beside ML-DSA-65, as the package has
+handled both since 1.1.0.
+
+`DEFAULT_ALG` stays `ML-DSA-65`. It is how a registry record with no `alg`
+reads, and how `applyVerifyMode()` reads a caller that names no set. Both
+predate the field, when every registered key was ML-DSA-65. It never picks the
+set for a new key, and its comment now says so.
+
 ## 1.1.0
 **Registry records carry the algorithm.** `KidRecord` gains `alg`, the ML-DSA
 parameter set the registry holds the key under (`ML-DSA-65` or `ML-DSA-87`). A
