@@ -34,7 +34,7 @@ Verification modes for KXCO post-quantum envelopes, and the line between what is
 npm install kxco-pq-network
 ```
 
-Node 20.19+. ESM only.
+Node 22.12+. ESM only.
 
 ---
 
