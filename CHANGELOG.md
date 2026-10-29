@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.1 (2026-10-29)
+
+Dependencies and documentation. No source file changed and the API is the same.
+
+- `kxco-post-quantum` dependency floor moves from `^1.6.0` to `^1.13.0`, the current release.
+- SALES-SKU.md says Armature L1 verifies ML-DSA-87 and ML-DSA-65 in consensus, ML-DSA-87 at precompile `0x4b58434f00000000000000000000000000000087` and ML-DSA-65 at `0x0b`. It named ML-DSA-65 only.
+
 ## 1.2.0 (2026-10-09)
 
 Runtime support. No change to the API or its behaviour.

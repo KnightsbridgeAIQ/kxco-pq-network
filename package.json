@@ -1,6 +1,6 @@
 {
   "name": "kxco-pq-network",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Three levels of proof for post-quantum envelopes: the signature offline, an Armature L1 anchor offline, and a live key-registry check that catches a revoked key and fails closed. Shared across the kxco-pq packages.",
   "keywords": [
     "post-quantum",
@@ -65,7 +65,7 @@
     "node": ">=22.12"
   },
   "dependencies": {
-    "kxco-post-quantum": "^1.6.0"
+    "kxco-post-quantum": "^1.13.0"
   },
   "scripts": {
     "test": "node --test --test-timeout=30000 test/network.test.js test/registry.test.js test/property.test.js test/ml-dsa-87.test.js",
